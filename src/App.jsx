@@ -4,6 +4,30 @@ import { useState, useRef, useEffect } from "react";
 function App() {
   const [isLoading, data] = useFetch("http://localhost:3000/todo");
   const [todo, setTodo] = useState([]);
+  const [currentTodo, setCurrentTodo] = useState(null);
+  const [time, setTime] = useState(0);
+  const [isTimer, setIsTimer] = useState(false);
+
+  useEffect(() => {
+    if (currentTodo) {
+      fetch(`http://localhost:3000/todo/${currentTodo}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          time: todo.find((el) => el.id === currentTodo).time + 1,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) =>
+          setTodo((prev) =>
+            prev.map((el) => (el.id === currentTodo ? res : el))
+          )
+        );
+    }
+  }, [time]);
+
+  useEffect(() => {
+    setTime(0);
+  }, [isTimer]);
 
   useEffect(() => {
     if (data) setTodo(data);
@@ -11,13 +35,26 @@ function App() {
 
   return (
     <>
-      <Advice />
-      <br />
+      <h1>TODO LIST</h1>
       <Clock />
-      <Stopwatch />
-      <Timer />
+
+      <Advice />
+      <button onClick={() => setIsTimer((prev) => !prev)}>
+        {isTimer ? "스톱워치로 변경" : "타이머로 변경"}
+      </button>
+      <br />
+      {isTimer ? (
+        <Timer time={time} setTime={setTime} />
+      ) : (
+        <Stopwatch time={time} setTime={setTime} />
+      )}
       <TodoInput setTodo={setTodo} />
-      <TodoList todo={todo} setTodo={setTodo} />
+      <TodoList
+        todo={todo}
+        setTodo={setTodo}
+        setCurrentTodo={setCurrentTodo}
+        currentTodo={currentTodo}
+      />
     </>
   );
 }
@@ -46,8 +83,8 @@ const Advice = () => {
     <>
       {!isLoading && (
         <>
-          <div>{data.message}</div>
-          <div>-{data.author}-</div>
+          <div className="advice">{data.message}</div>
+          <div className="author">- {data.author} -</div>
         </>
       )}
     </>
@@ -63,7 +100,7 @@ const Clock = () => {
     }, 1000);
   }, []);
 
-  return <div>{time.toLocaleTimeString()}</div>;
+  return <div className="clock">{time.toLocaleTimeString()}</div>;
 };
 
 //타이머 함수
@@ -71,16 +108,15 @@ const formatTime = (seconds) => {
   const timeString = `${String(Math.floor(seconds / 3600)).padStart(
     2,
     "0"
-  )}시간:${String(Math.floor((seconds % 3600) / 60)).padStart(
+  )}:${String(Math.floor((seconds % 3600) / 60)).padStart(
     2,
     "0"
-  )}분:${String(Math.floor(seconds % 60)).padStart(2, "0")}초.`;
+  )}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
   return timeString;
 };
 // Stopwatch
 
-const Stopwatch = () => {
-  const [time, setTime] = useState(0);
+const Stopwatch = ({ time, setTime }) => {
   const [isOn, setIsOn] = useState(false);
   const timerRef = useRef(null);
 
@@ -114,10 +150,9 @@ const Stopwatch = () => {
 };
 
 // Timer
-const Timer = () => {
+const Timer = ({ time, setTime }) => {
   const [startTime, setStartTime] = useState(0);
   const [isOn, setIsOn] = useState(false);
-  const [time, setTime] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -172,6 +207,7 @@ const TodoInput = ({ setTodo }) => {
   const addTodo = () => {
     const newTodo = {
       content: inputRef.current.value,
+      time: 0,
     };
     fetch("http://localhost:3000/todo", {
       method: "POST",
@@ -184,38 +220,58 @@ const TodoInput = ({ setTodo }) => {
   return (
     <>
       <input ref={inputRef} />
-      <button onClick={addTodo}>추가</button>
+      <button
+        onClick={() => {
+          addTodo();
+          inputRef.current.value = "";
+        }}
+      >
+        추가
+      </button>
     </>
   );
 };
 
-const TodoList = ({ todo, setTodo }) => {
+const TodoList = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
   return (
     <ul>
       {todo.map((el) => (
-        <Todo key={el.id} todo={el} setTodo={setTodo} />
+        <Todo
+          key={el.id}
+          todo={el}
+          setTodo={setTodo}
+          currentTodo={currentTodo}
+          setCurrentTodo={setCurrentTodo}
+        />
       ))}
     </ul>
   );
 };
 
-const Todo = ({ todo, setTodo }) => {
+const Todo = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
   return (
-    <li>
-      {todo.content}
-      <button
-        onClick={() => {
-          fetch(`http://localhost:3000/todo/${todo.id}`, {
-            method: "DELETE",
-          }).then((res) => {
-            if (res.ok) {
-              setTodo((prev) => prev.filter((el) => el.id !== todo.id));
-            }
-          });
-        }}
-      >
-        삭제
-      </button>
+    <li className={currentTodo === todo.id ? "current" : ""}>
+      <div>
+        {todo.content}
+        <br />
+        {formatTime(todo.time)}
+      </div>
+      <div>
+        <button onClick={() => setCurrentTodo(todo.id)}>시작하기</button>
+        <button
+          onClick={() => {
+            fetch(`http://localhost:3000/todo/${todo.id}`, {
+              method: "DELETE",
+            }).then((res) => {
+              if (res.ok) {
+                setTodo((prev) => prev.filter((el) => el.id !== todo.id));
+              }
+            });
+          }}
+        >
+          삭제
+        </button>
+      </div>
     </li>
   );
 };
