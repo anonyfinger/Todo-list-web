@@ -11,6 +11,8 @@ function App() {
 
   return (
     <>
+      <Advice />
+      <br />
       <Clock />
       <Stopwatch />
       <Timer />
@@ -19,6 +21,38 @@ function App() {
     </>
   );
 }
+
+// 명언
+
+const useFetch = (url) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then((res) => {
+        setData(res);
+        setIsLoading(false);
+      });
+  }, [url]);
+  return [isLoading, data];
+};
+
+const Advice = () => {
+  const [isLoading, data] = useFetch(
+    "https://korean-advice-open-api.vercel.app/api/advice"
+  );
+  return (
+    <>
+      {!isLoading && (
+        <>
+          <div>{data.message}</div>
+          <div>-{data.author}-</div>
+        </>
+      )}
+    </>
+  );
+};
 
 const Clock = () => {
   const [time, setTime] = useState(new Date());
