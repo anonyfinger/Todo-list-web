@@ -283,13 +283,29 @@ const TodoInput = ({ setTodo }) => {
     inputRef.current.placeholder = "할 일을 입력하세요";
     inputRef.current.classList.remove("error");
     inputRef.current.style.color = "white";
+    
     fetch("http://localhost:3000/todo", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ content: newTodo, time: 0 }),
     })
-      .then((res) => res.json())
-      .then((res) => setTodo((prev) => [...prev, res]));
-    inputRef.current.value = "";
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('추가에 실패했습니다');
+        }
+        return res.json();
+      })
+      .then((res) => {
+        setTodo((prev) => [...prev, res]);
+        inputRef.current.value = "";
+      })
+      .catch((error) => {
+        console.error('Todo 추가 중 오류 발생:', error);
+        inputRef.current.placeholder = "추가 실패. 다시 시도해주세요";
+        inputRef.current.classList.add("error");
+      });
   };
 
   return (
@@ -355,3 +371,4 @@ const Todo = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
 };
 
 export default App;
+  

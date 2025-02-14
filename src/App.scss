@@ -1,3 +1,4 @@
+@use "sass:color";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap");
 
 /* 색상 및 기본 변수 설정 (파일 상단에 추가) */
@@ -5,7 +6,7 @@ $background: #121212;
 $panel-bg: #1e1e1e;
 $text-color: #e0e0e0;
 $accent: #00796b; // 더 어두운 티얼 계열
-$accent-hover: darken($accent, 10%);
+$accent-hover: color.adjust($accent, $lightness: -10%);
 
 body {
   font-family: "Noto Sans KR", Arial, sans-serif;
@@ -66,7 +67,11 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(180deg, $panel-bg 0%, lighten($panel-bg, 5%) 100%);
+  background: linear-gradient(
+    180deg,
+    $panel-bg 0%,
+    color.adjust($panel-bg, $lightness: 5%) 100%
+  );
   border: 2px solid $accent;
   border-radius: 12px;
   padding: 20px;
@@ -283,9 +288,9 @@ main {
 /* 시계 자체의 스타일을 강조 */
 .clock {
   font-size: 2.5em;
-  padding: px;
+  padding: 0;
   border: none;
-  background-color: transarent;
+  background-color: transparent;
   text-align: center;
   width: auto;
   margin: 0 auto;
@@ -301,10 +306,15 @@ main {
 
 /* PC 화면에서 .app 컨테이너가 화면 전체를 채우도록 수정 */
 @media (min-width: 1024px) {
+  body {
+    padding: 0;
+  }
+
   .app {
     width: 100vw;
     max-width: 100vw;
     height: 100vh;
+    min-height: 100vh;
     margin: 0;
     border-radius: 0;
     box-shadow: none;
@@ -431,5 +441,17 @@ button {
 
 .advice-section .author {
   font-size: 1em;
-  color: lighten($text-color, 20%);
+  color: color.adjust($text-color, $lightness: 20%);
+}
+
+.panel {
+  background: linear-gradient(
+    180deg,
+    $panel-bg 0%,
+    color.adjust($panel-bg, $lightness: 5%) 100%
+  );
+}
+
+.text-light {
+  color: color.adjust($text-color, $lightness: 20%);
 }
