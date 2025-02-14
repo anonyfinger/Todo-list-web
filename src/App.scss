@@ -1,0 +1,435 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap");
+
+/* 색상 및 기본 변수 설정 (파일 상단에 추가) */
+$background: #121212;
+$panel-bg: #1e1e1e;
+$text-color: #e0e0e0;
+$accent: #00796b; // 더 어두운 티얼 계열
+$accent-hover: darken($accent, 10%);
+
+body {
+  font-family: "Noto Sans KR", Arial, sans-serif;
+  /* 어두운 그라데이션 배경 */
+  background: $background;
+  color: $text-color;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.app {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: $panel-bg;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 90vh;
+}
+
+/* 헤더 영역 스타일 추가 */
+header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 20px;
+  margin-bottom: 20px;
+  background-color: $panel-bg;
+  position: relative; /* 내부 절대 위치 요소 기준 설정 */
+}
+
+.title {
+  font-size: 3em;
+  margin-bottom: 1rem;
+  color: #bb86fc;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 메인 영역 그리드 레이아웃 */
+main {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* 타이머 / 스톱워치 영역 스타일 */
+.timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, $panel-bg 0%, lighten($panel-bg, 5%) 100%);
+  border: 2px solid $accent;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* 호버 효과 추가 */
+.timer-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 할 일 영역 스타일 */
+.todo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $panel-bg;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid $accent;
+}
+
+.clock,
+.advice-container,
+.stopwatch,
+.timer,
+.todo-input,
+.todo-list {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.advice-container {
+  text-align: center;
+}
+
+.advice {
+  font-size: 1.2em;
+  margin-bottom: 5px;
+  color: $accent;
+}
+
+.author {
+  font-size: 1em;
+  color: #b0b0b0;
+}
+
+.toggle-timer {
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  background-color: $accent;
+  color: #121212;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.stopwatch,
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $panel-bg;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.start-stop,
+.reset,
+.start,
+.stop {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: $accent;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.start-stop:hover,
+.reset:hover,
+.start:hover,
+.stop:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+.todo-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $panel-bg;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.todo-input input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: #ffffff;
+  font-size: 1em;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+.todo-input input::placeholder {
+  color: #888;
+}
+
+.todo-input input.error::placeholder {
+  color: red;
+}
+
+.add-todo {
+  margin-left: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.add-todo:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+.warning {
+  color: #ff5252;
+  font-size: 0.9em;
+  margin-top: 0.5rem;
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  background-color: $panel-bg;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.todo-item.current {
+  background-color: #333;
+}
+
+.todo-content {
+  flex-grow: 1;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.start-todo,
+.delete-todo {
+  padding: 5px 10px;
+  background-color: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.start-todo:hover,
+.delete-todo:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+/* 반응형 디자인: 화면이 넓어지기 전에(576px 이상) 타이머와 할일 영역을 상하로 배치 */
+@media (min-width: 576px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 시계 박스를 위한 별도 스타일 추가 */
+.clock-box {
+  position: relative;
+  top: 0px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  margin: 0;
+}
+
+/* 시계 자체의 스타일을 강조 */
+.clock {
+  font-size: 2.5em;
+  padding: px;
+  border: none;
+  background-color: transarent;
+  text-align: center;
+  width: auto;
+  margin: 0 auto;
+}
+
+/* 모바일 환경에서 .clock 스타일 조정 */
+@media (max-width: 480px) {
+  .clock {
+    font-size: 1.8em;
+    padding: 10px;
+  }
+}
+
+/* PC 화면에서 .app 컨테이너가 화면 전체를 채우도록 수정 */
+@media (min-width: 1024px) {
+  .app {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1rem;
+  }
+}
+
+/* 새로 추가된 타이머/스톱워치 영역의 내부 레이아웃 */
+.stopwatch-container,
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-display {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* 숫자 입력을 위한 스타일 추가 */
+.time-set {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1em;
+  margin-top: 10px;
+}
+
+/* Toggle 버튼 스타일: 스톱워치/타이머 모드 변경 버튼 */
+.toggle-mode {
+  padding: 10px 20px;
+  background-color: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.toggle-mode:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+/* Start/Stop 버튼 스타일 업데이트 */
+.start-stop {
+  background-color: $accent;
+  color: #fff;
+  padding: 10px 20px;
+}
+.start-stop:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+/* Reset 버튼 스타일 업데이트 */
+.reset {
+  background-color: #d32f2f;
+  color: #fff;
+  padding: 10px 20px;
+}
+.reset:hover {
+  background-color: #b71c1c;
+  transform: scale(1.05);
+}
+
+/* 프리셋 버튼 (.preset-button) 스타일 업데이트 */
+.preset-button {
+  padding: 6px 12px;
+  background-color: $accent;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.preset-button:hover {
+  background-color: $accent-hover;
+  transform: scale(1.05);
+}
+
+/* 전역 기본 스타일 (이미 적용 중인 부분이 있다면 건드리지 않아도 됨) */
+button {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* 기타 색상 관련 통일감 (필요하다면 다른 요소도 동일한 변수 사용)
+   예: header, mode-indicator 등 */
+.mode-indicator {
+  color: $accent;
+  font-weight: bold;
+  font-size: 1.8em;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* 분리된 명언 섹션 스타일 */
+.advice-section {
+  background-color: $panel-bg;
+  border: 1px solid $accent;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  margin: 20px auto;
+  max-width: 800px;
+  text-align: center;
+}
+
+.advice-section .advice {
+  font-size: 1.4em;
+  color: $accent;
+  margin-bottom: 0.5rem;
+}
+
+.advice-section .author {
+  font-size: 1em;
+  color: lighten($text-color, 20%);
+}

@@ -34,28 +34,46 @@ function App() {
   }, [isLoading]);
 
   return (
-    <>
-      <h1>TODO LIST</h1>
+    <div className="app">
+      <header>
+        <h1 className="title">TODO LIST</h1>
       <Clock />
 
-      <Advice />
-      <button onClick={() => setIsTimer((prev) => !prev)}>
-        {isTimer ? "스톱워치로 변경" : "타이머로 변경"}
-      </button>
-      <br />
-      {isTimer ? (
-        <Timer time={time} setTime={setTime} />
-      ) : (
-        <Stopwatch time={time} setTime={setTime} />
-      )}
-      <TodoInput setTodo={setTodo} />
-      <TodoList
-        todo={todo}
-        setTodo={setTodo}
-        setCurrentTodo={setCurrentTodo}
-        currentTodo={currentTodo}
-      />
-    </>
+      </header>
+
+      <section className="advice-section">
+        <Advice />
+      </section>
+      <main>
+        <section className="timer-section">
+          <div className="mode-indicator">
+            {isTimer ? "타이머" : "스톱워치"}
+          </div>
+          {isTimer ? (
+            <Timer
+              time={time}
+              setTime={setTime}
+              toggleMode={() => setIsTimer(false)}
+            />
+          ) : (
+            <Stopwatch
+              time={time}
+              setTime={setTime}
+              toggleMode={() => setIsTimer(true)}
+            />
+          )}
+        </section>
+        <section className="todo-section">
+          <TodoInput setTodo={setTodo} />
+          <TodoList
+            todo={todo}
+            setTodo={setTodo}
+            setCurrentTodo={setCurrentTodo}
+            currentTodo={currentTodo}
+          />
+        </section>
+      </main>
+    </div>
   );
 }
 
@@ -95,12 +113,17 @@ const Clock = () => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    setInterval(() => {
+    const timerId = setInterval(() => {
       setTime(new Date());
     }, 1000);
+    return () => clearInterval(timerId);
   }, []);
 
-  return <div className="clock">{time.toLocaleTimeString()}</div>;
+  return (
+    <div className="clock-box">
+      <span className="clock">{time.toLocaleTimeString()}</span>
+    </div>
+  );
 };
 
 //타이머 함수
@@ -108,15 +131,15 @@ const formatTime = (seconds) => {
   const timeString = `${String(Math.floor(seconds / 3600)).padStart(
     2,
     "0"
-  )}:${String(Math.floor((seconds % 3600) / 60)).padStart(
-    2,
-    "0"
-  )}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+  )}:${String(Math.floor((seconds % 3600) / 60)).padStart(2, "0")}:${String(
+    Math.floor(seconds % 60)
+  ).padStart(2, "0")}`;
   return timeString;
 };
+
 // Stopwatch
 
-const Stopwatch = ({ time, setTime }) => {
+const Stopwatch = ({ time, setTime, toggleMode }) => {
   const [isOn, setIsOn] = useState(false);
   const timerRef = useRef(null);
 
@@ -132,25 +155,31 @@ const Stopwatch = ({ time, setTime }) => {
   }, [isOn]);
 
   return (
-    <div>
-      {formatTime(time)}
-      <button onClick={() => setIsOn((prev) => !prev)}>
-        {isOn ? "종료" : "시작"}
-      </button>
-      <button
-        onClick={() => {
-          setTime(0);
-          setIsOn(false);
-        }}
-      >
-        리셋
-      </button>
+    <div className="stopwatch-container">
+      <div className="time-display">{formatTime(time)}</div>
+      <div className="controls">
+        <button className="toggle-mode" onClick={toggleMode}>
+          타이머로 변경
+        </button>
+        <button className="start-stop" onClick={() => setIsOn((prev) => !prev)}>
+          {isOn ? "종료" : "시작"}
+        </button>
+        <button
+          className="reset"
+          onClick={() => {
+            setTime(0);
+            setIsOn(false);
+          }}
+        >
+          리셋
+        </button>
+      </div>
     </div>
   );
 };
 
 // Timer
-const Timer = ({ time, setTime }) => {
+const Timer = ({ time, setTime, toggleMode }) => {
   const [startTime, setStartTime] = useState(0);
   const [isOn, setIsOn] = useState(false);
   const timerRef = useRef(null);
@@ -168,20 +197,30 @@ const Timer = ({ time, setTime }) => {
   }, [isOn, time]);
 
   return (
-    <div>
-      <div>
-        {time ? formatTime(time) : formatTime(startTime)}
+    <div className="timer-container">
+      <div className="time-display">
+        남은 시간: {time ? formatTime(time) : formatTime(startTime)}
+      </div>
+      <div className="controls">
+        <button className="toggle-mode" onClick={toggleMode}>
+          스톱워치로 변경
+        </button>
         <button
+          className="start-stop"
           onClick={() => {
-            setIsOn(true);
-            setTime(time ? time : startTime);
-            setStartTime(0);
+            if (!isOn) {
+              setIsOn(true);
+              setTime(time ? time : startTime);
+              setStartTime(0);
+            } else {
+              setIsOn(false);
+            }
           }}
         >
-          시작
+          {isOn ? "정지" : "시작"}
         </button>
-        <button onClick={() => setIsOn(false)}>정지</button>
         <button
+          className="reset"
           onClick={() => {
             setTime(0);
             setIsOn(false);
@@ -190,51 +229,87 @@ const Timer = ({ time, setTime }) => {
           리셋
         </button>
       </div>
-      <input
-        type="range"
-        value={startTime}
-        min="0"
-        max="3600"
-        step="30"
-        onChange={(event) => setStartTime(event.target.value)}
-      />
+      <div className="time-set">
+        <label htmlFor="timeInput">설정:</label>
+        <input
+          id="timeInput"
+          type="number"
+          value={startTime}
+          min="0"
+          max="3600"
+          step="30"
+          onChange={(event) => setStartTime(Number(event.target.value))}
+        />
+        <span>초</span>
+        <div className="preset-buttons">
+          <button className="preset-button" onClick={() => setStartTime(60)}>
+            1분
+          </button>
+          <button className="preset-button" onClick={() => setStartTime(600)}>
+            10분
+          </button>
+          <button className="preset-button" onClick={() => setStartTime(1800)}>
+            30분
+          </button>
+          <button className="preset-button" onClick={() => setStartTime(3600)}>
+            1시간
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 const TodoInput = ({ setTodo }) => {
   const inputRef = useRef(null);
+
+  const handleInputChange = () => {
+    inputRef.current.classList.remove("error");
+    inputRef.current.style.color = "white";
+  };
+
   const addTodo = () => {
-    const newTodo = {
-      content: inputRef.current.value,
-      time: 0,
-    };
+    const newTodo = inputRef.current.value.trim();
+    if (newTodo === "") {
+      inputRef.current.value = "";
+      inputRef.current.placeholder = "입력 후 추가해주세요";
+      inputRef.current.classList.add("error");
+      setTimeout(() => {
+        inputRef.current.placeholder = "할 일을 입력하세요";
+        inputRef.current.classList.remove("error");
+      }, 3000);
+      return;
+    }
+    inputRef.current.placeholder = "할 일을 입력하세요";
+    inputRef.current.classList.remove("error");
+    inputRef.current.style.color = "white";
     fetch("http://localhost:3000/todo", {
       method: "POST",
-      body: JSON.stringify(newTodo),
+      body: JSON.stringify({ content: newTodo, time: 0 }),
     })
       .then((res) => res.json())
       .then((res) => setTodo((prev) => [...prev, res]));
+    inputRef.current.value = "";
   };
 
   return (
-    <>
-      <input ref={inputRef} />
-      <button
-        onClick={() => {
-          addTodo();
-          inputRef.current.value = "";
-        }}
-      >
+    <div className="todo-input">
+      <input
+        ref={inputRef}
+        className="todo-input-field"
+        placeholder="할 일을 입력하세요"
+        onChange={handleInputChange}
+      />
+      <button className="add-todo" onClick={addTodo}>
         추가
       </button>
-    </>
+    </div>
   );
 };
 
 const TodoList = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
   return (
-    <ul>
+    <ul className="todo-list">
       {todo.map((el) => (
         <Todo
           key={el.id}
@@ -250,15 +325,18 @@ const TodoList = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
 
 const Todo = ({ todo, setTodo, setCurrentTodo, currentTodo }) => {
   return (
-    <li className={currentTodo === todo.id ? "current" : ""}>
-      <div>
+    <li className={currentTodo === todo.id ? "todo-item current" : "todo-item"}>
+      <div className="todo-content">
         {todo.content}
         <br />
         {formatTime(todo.time)}
       </div>
-      <div>
-        <button onClick={() => setCurrentTodo(todo.id)}>시작하기</button>
+      <div className="todo-actions">
+        <button className="start-todo" onClick={() => setCurrentTodo(todo.id)}>
+          시작하기
+        </button>
         <button
+          className="delete-todo"
           onClick={() => {
             fetch(`http://localhost:3000/todo/${todo.id}`, {
               method: "DELETE",
